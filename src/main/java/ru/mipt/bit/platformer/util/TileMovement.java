@@ -17,6 +17,10 @@ public class TileMovement {
         this.interpolation = interpolation;
     }
 
+    public Rectangle placeAtTileCenter(Rectangle rectangle, GridPoint2 tileCoordinates) {
+        return moveRectangleAtTileCenter(tileLayer, rectangle, tileCoordinates);
+    }
+
     public Rectangle moveRectangleBetweenTileCenters(Rectangle rectangle, GridPoint2 fromTileCoordinates, GridPoint2 toTileCoordinates, float progress) {
         moveRectangleAtTileCenter(tileLayer, rectangle, fromTileCoordinates);
         float fromTileBottomLeftX = rectangle.x;
