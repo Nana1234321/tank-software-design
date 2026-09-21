@@ -1,57 +1,31 @@
 package ru.mipt.bit.platformer;
 
-import com.badlogic.gdx.Input;
+import java.util.Objects;
+import java.util.function.IntPredicate;
+import static com.badlogic.gdx.Input.Keys.*;
 
-import static com.badlogic.gdx.Input.Keys.A;
-import static com.badlogic.gdx.Input.Keys.D;
-import static com.badlogic.gdx.Input.Keys.DOWN;
-import static com.badlogic.gdx.Input.Keys.LEFT;
-import static com.badlogic.gdx.Input.Keys.RIGHT;
-import static com.badlogic.gdx.Input.Keys.S;
-import static com.badlogic.gdx.Input.Keys.UP;
-import static com.badlogic.gdx.Input.Keys.W;
-
-public final class TankController {
-
-    private final Input input;
+public final class TankController implements InputHandler {
     private final Tank tank;
-    private final Field field;
+    private final IntPredicate isKeyPressed;
 
-    public TankController(
-            Input input,
-            Tank tank,
-            Field field
-    ) {
-        this.input = input;
-        this.tank = tank;
-        this.field = field;
+    public TankController(Tank tank, IntPredicate isKeyPressed) {
+        this.tank = Objects.requireNonNull(tank);
+        this.isKeyPressed = Objects.requireNonNull(isKeyPressed);
     }
 
+    @Override
     public void handleInput() {
         Direction direction = getPressedDirection();
-
         if (direction != null) {
-            tank.tryMove(direction, field);
+            tank.move(direction);
         }
     }
 
     private Direction getPressedDirection() {
-        if (input.isKeyPressed(UP) || input.isKeyPressed(W)) {
-            return Direction.UP;
-        }
-
-        if (input.isKeyPressed(LEFT) || input.isKeyPressed(A)) {
-            return Direction.LEFT;
-        }
-
-        if (input.isKeyPressed(DOWN) || input.isKeyPressed(S)) {
-            return Direction.DOWN;
-        }
-
-        if (input.isKeyPressed(RIGHT) || input.isKeyPressed(D)) {
-            return Direction.RIGHT;
-        }
-
+        if (isKeyPressed.test(UP) || isKeyPressed.test(W)) return Direction.UP;
+        if (isKeyPressed.test(LEFT) || isKeyPressed.test(A)) return Direction.LEFT;
+        if (isKeyPressed.test(DOWN) || isKeyPressed.test(S)) return Direction.DOWN;
+        if (isKeyPressed.test(RIGHT) || isKeyPressed.test(D)) return Direction.RIGHT;
         return null;
     }
 }

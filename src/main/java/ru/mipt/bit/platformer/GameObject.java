@@ -1,46 +1,19 @@
 package ru.mipt.bit.platformer;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 
-import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
+public abstract class GameObject {
+    public abstract boolean occupies(GridPoint2 cell);
 
-public abstract class GameObject implements Disposable {
+    /** Returns a new center position in grid units, never internal mutable state. */
+    public abstract Vector2 getPositionOnGrid();
 
-    private final Texture texture;
-    private final TextureRegion graphics;
-    private final Rectangle rectangle;
-
-    protected GameObject(String texturePath) {
-        texture = new Texture(texturePath);
-        graphics = new TextureRegion(texture);
-        rectangle = createBoundingRectangle(graphics);
-    }
-
-    protected final Rectangle getRectangle() {
-        return rectangle;
-    }
-
-    protected float getRotationDegrees() {
+    public float getRotationDegrees() {
         return 0f;
     }
 
-    public final void render(Batch batch) {
-        drawTextureRegionUnscaled(
-                batch,
-                graphics,
-                rectangle,
-                getRotationDegrees()
-        );
-    }
-
-    @Override
-    public final void dispose() {
-        texture.dispose();
+    public void update(float deltaTime) {
+        // Static objects have no time-dependent behavior.
     }
 }
-

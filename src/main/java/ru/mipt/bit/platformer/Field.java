@@ -1,80 +1,66 @@
 package ru.mipt.bit.platformer;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.maps.MapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.GridPoint2;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Disposable;
-import ru.mipt.bit.platformer.util.TileMovement;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRenderer;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
+public final class Field {
+    private final int width;
+    private final int height;
+    private final List<GameObject> objects = new ArrayList<>();
 
-public final class Field implements Disposable {
-
-    private final TiledMap map;
-    private final MapRenderer mapRenderer;
-    private final TiledMapTileLayer groundLayer;
-    private final TileMovement tileMovement;
-    private final List<Obstacle> obstacles = new ArrayList<>();
-
-    public Field(String mapPath, Batch batch) {
-        map = new TmxMapLoader().load(mapPath);
-        mapRenderer = createSingleLayerMapRenderer(map, batch);
-        groundLayer = getSingleLayer(map);
-        tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
-    }
-
-    public TileMovement getTileMovement() {
-        return tileMovement;
-    }
-
-    public void addObstacle(Obstacle obstacle) {
-        obstacles.add(obstacle);
-    }
-
-    public boolean isBlocked(GridPoint2 coordinates) {
-        if (isOutside(coordinates)) {
-            return true;
+    public Field(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Field dimensions must be positive");
         }
+        this.width = width;
+        this.height = height;
+    }
 
-        for (Obstacle obstacle : obstacles) {
-            if (obstacle.occupies(coordinates)) {
-                return true;
+    public Tank spawnTank(GridPoint2 cell, Direction direction, float movementDuration) {
+        requireFreeCell(cell);
+        Tank tank = new Tank(cell, direction, this, movementDuration);
+        objects.add(tank);
+        return tank;
+    }
+
+    public Tree spawnTree(GridPoint2 cell) {
+        requireFreeCell(cell);
+        Tree tree = new Tree(cell);
+        objects.add(tree);
+        return tree;
+    }
+
+    /** A read-only view; registration remains the field's responsibility. */
+    public List<GameObject> getObjects() {
+        return Collections.unmodifiableList(objects);
+    }
+
+    public boolean isFree(GridPoint2 cell, GameObject asker) {
+        if (cell.x < 0 || cell.y < 0 || cell.x >= width || cell.y >= height) {
+            return false;
+        }
+        for (GameObject object : objects) {
+            if (object != asker && object.occupies(cell)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
-    public void renderGround() {
-        mapRenderer.render();
-    }
-
-    public void renderObstacles(Batch batch) {
-        for (Obstacle obstacle : obstacles) {
-            obstacle.render(batch);
+    public void update(float deltaTime) {
+        if (!Float.isFinite(deltaTime) || deltaTime < 0f) {
+            throw new IllegalArgumentException("Delta time must be finite and non-negative");
+        }
+        for (GameObject object : objects) {
+            object.update(deltaTime);
         }
     }
 
-    private boolean isOutside(GridPoint2 coordinates) {
-        return coordinates.x < 0
-                || coordinates.y < 0
-                || coordinates.x >= groundLayer.getWidth()
-                || coordinates.y >= groundLayer.getHeight();
-    }
-
-    @Override
-    public void dispose() {
-        for (Obstacle obstacle : obstacles) {
-            obstacle.dispose();
+    private void requireFreeCell(GridPoint2 cell) {
+        if (!isFree(cell, null)) {
+            throw new IllegalArgumentException("Cannot spawn an object at " + cell);
         }
-        map.dispose();
     }
 }
-
