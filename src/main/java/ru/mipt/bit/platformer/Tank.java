@@ -7,20 +7,20 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.Objects;
 
-public final class Tank extends GameObject {
+public final class Tank extends GameObject implements Movable {
 
     private final GridPoint2 coordinates;
     private final GridPoint2 destinationCoordinates;
-    private final Field field;
+    private final MovementSpace movementSpace;
     private final float movementDuration;
 
     private Direction direction;
     private float movementProgress = 1f;
 
-    Tank(
+    public Tank(
             GridPoint2 initialCoordinates,
             Direction initialDirection,
-            Field field,
+            MovementSpace movementSpace,
             float movementDuration
     ) {
 
@@ -30,12 +30,13 @@ public final class Tank extends GameObject {
         this.coordinates = new GridPoint2(initialCoordinates);
         this.destinationCoordinates = new GridPoint2(initialCoordinates);
         this.direction = Objects.requireNonNull(initialDirection);
-        this.field = Objects.requireNonNull(field);
+        this.movementSpace = Objects.requireNonNull(movementSpace);
         this.movementDuration = movementDuration;
 
     }
 
     /** Starts a step if the next cell is free; ignores commands during a step. */
+    @Override
     public void move(Direction newDirection) {
         if (isMoving()) {
             return;
@@ -46,7 +47,7 @@ public final class Tank extends GameObject {
         GridPoint2 adjacentCoordinates =
                 newDirection.getAdjacentCoordinates(coordinates);
 
-        if (field.isFree(adjacentCoordinates, this)) {
+        if (movementSpace.isFree(adjacentCoordinates, this)) {
             destinationCoordinates.set(adjacentCoordinates);
             movementProgress = 0f;
         }
