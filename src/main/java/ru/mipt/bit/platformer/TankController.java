@@ -1,31 +1,41 @@
 package ru.mipt.bit.platformer;
 
 import java.util.Objects;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.IntPredicate;
-import static com.badlogic.gdx.Input.Keys.*;
 
 public final class TankController implements InputHandler {
-    private final Tank tank;
+    private final Movable target;
     private final IntPredicate isKeyPressed;
+    private final Map<Integer, Direction> keyBindings;
 
-    public TankController(Tank tank, IntPredicate isKeyPressed) {
-        this.tank = Objects.requireNonNull(tank);
+    /** Binding iteration order determines priority when several keys are pressed. */
+    public TankController(Movable target, IntPredicate isKeyPressed,
+                          Map<Integer, Direction> keyBindings) {
+        this.target = Objects.requireNonNull(target);
         this.isKeyPressed = Objects.requireNonNull(isKeyPressed);
+        Map<Integer, Direction> copy = new LinkedHashMap<>();
+        Objects.requireNonNull(keyBindings).forEach((key, direction) ->
+                copy.put(Objects.requireNonNull(key), Objects.requireNonNull(direction)));
+        this.keyBindings = Collections.unmodifiableMap(copy);
     }
 
     @Override
     public void handleInput() {
         Direction direction = getPressedDirection();
         if (direction != null) {
-            tank.move(direction);
+            target.move(direction);
         }
     }
 
     private Direction getPressedDirection() {
-        if (isKeyPressed.test(UP) || isKeyPressed.test(W)) return Direction.UP;
-        if (isKeyPressed.test(LEFT) || isKeyPressed.test(A)) return Direction.LEFT;
-        if (isKeyPressed.test(DOWN) || isKeyPressed.test(S)) return Direction.DOWN;
-        if (isKeyPressed.test(RIGHT) || isKeyPressed.test(D)) return Direction.RIGHT;
+        for (Map.Entry<Integer, Direction> binding : keyBindings.entrySet()) {
+            if (isKeyPressed.test(binding.getKey())) {
+                return binding.getValue();
+            }
+        }
         return null;
     }
 }

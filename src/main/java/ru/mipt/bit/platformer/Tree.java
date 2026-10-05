@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 public final class Tree extends GameObject {
     private final GridPoint2 coordinates;
 
-    Tree(GridPoint2 coordinates) {
+    public Tree(GridPoint2 coordinates) {
         this.coordinates = new GridPoint2(coordinates);
     }
 

@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
 public final class GameApplication extends ApplicationAdapter {
@@ -27,9 +30,19 @@ public final class GameApplication extends ApplicationAdapter {
 
     private void createScene() {
         field = new Field(renderer.getWidth(), renderer.getHeight());
-        Tank tank = field.spawnTank(new GridPoint2(1, 1), Direction.RIGHT, TANK_MOVEMENT_DURATION);
-        field.spawnTree(new GridPoint2(1, 3));
-        inputHandlers.add(new TankController(tank, key -> Gdx.input.isKeyPressed(key)));
+        Tank tank = field.addObject(new Tank(
+                new GridPoint2(1, 1), Direction.RIGHT, field, TANK_MOVEMENT_DURATION));
+        field.addObject(new Tree(new GridPoint2(1, 3)));
+        Map<Integer, Direction> bindings = new LinkedHashMap<>();
+        bindings.put(UP, Direction.UP);
+        bindings.put(W, Direction.UP);
+        bindings.put(LEFT, Direction.LEFT);
+        bindings.put(A, Direction.LEFT);
+        bindings.put(DOWN, Direction.DOWN);
+        bindings.put(S, Direction.DOWN);
+        bindings.put(RIGHT, Direction.RIGHT);
+        bindings.put(D, Direction.RIGHT);
+        inputHandlers.add(new TankController(tank, key -> Gdx.input.isKeyPressed(key), bindings));
     }
 
     @Override
