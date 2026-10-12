@@ -10,19 +10,19 @@ public class FieldTest {
         assertTrue(field.isFree(new GridPoint2(2,1), null));
         for (GridPoint2 cell : new GridPoint2[]{new GridPoint2(-1,0),new GridPoint2(0,-1),new GridPoint2(3,0),new GridPoint2(0,2)}) {
             assertFalse(field.isFree(cell, null));
-            assertThrows(IllegalArgumentException.class, () -> field.spawnTree(cell));
+            assertThrows(IllegalArgumentException.class, () -> field.addObject(new Tree(cell)));
         }
     }
     @Test public void registersObjectsAndExcludesAsker() {
         Field field = new Field(3,3);
-        Tank tank = field.spawnTank(new GridPoint2(0,0), Direction.RIGHT, 1f);
+        Tank tank = field.addObject(new Tank(new GridPoint2(0,0), Direction.RIGHT, field, 1f));
         assertEquals(1, field.getObjects().size());
         assertSame(tank, field.getObjects().get(0));
         assertFalse(field.isFree(new GridPoint2(0,0), null));
         assertTrue(field.isFree(new GridPoint2(0,0), tank));
-        field.spawnTree(new GridPoint2(1,0));
+        field.addObject(new Tree(new GridPoint2(1,0)));
         assertFalse(field.isFree(new GridPoint2(1,0), tank));
-        assertThrows(IllegalArgumentException.class, () -> field.spawnTree(new GridPoint2(1,0)));
+        assertThrows(IllegalArgumentException.class, () -> field.addObject(new Tree(new GridPoint2(1,0))));
         assertThrows(UnsupportedOperationException.class, () -> field.getObjects().clear());
     }
 }

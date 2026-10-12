@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 public class TankTest {
     private Tank spawn(Field field, int x, int y) {
-        return field.spawnTank(new GridPoint2(x,y), Direction.RIGHT, 1f);
+        return field.addObject(new Tank(new GridPoint2(x,y), Direction.RIGHT, field, 1f));
     }
     @Test public void interpolatesReservesAndCompletesStep() {
         Field field = new Field(4,4);
@@ -39,7 +39,7 @@ public class TankTest {
     @Test public void turnsButDoesNotEnterObstacleOrLeaveField() {
         Field field = new Field(3,3);
         Tank tank = spawn(field,0,0);
-        field.spawnTree(new GridPoint2(0,1));
+        field.addObject(new Tree(new GridPoint2(0,1)));
         tank.move(Direction.UP);
         tank.update(1f);
         assertEquals(90f, tank.getRotationDegrees(), 0f);

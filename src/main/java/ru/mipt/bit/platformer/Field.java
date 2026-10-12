@@ -49,6 +49,9 @@ public final class Field implements MovementSpace {
         return Collections.unmodifiableList(objects);
     }
 
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+
     @Override
     public boolean isFree(GridPoint2 cell, GameObject asker) {
         if (cell.x < 0 || cell.y < 0 || cell.x >= width || cell.y >= height) {
