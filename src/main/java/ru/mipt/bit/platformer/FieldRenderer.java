@@ -1,6 +1,7 @@
 package ru.mipt.bit.platformer;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -23,10 +24,34 @@ public final class FieldRenderer implements Disposable {
     private final Map<Class<? extends GameObject>, GameObjectRenderer> renderers = new HashMap<>();
 
     public FieldRenderer(String mapPath, Batch batch) {
+        this(mapPath, batch, 0, 0);
+    }
+
+    public FieldRenderer(String mapPath, Batch batch, int width, int height) {
         this.batch = batch;
         map = new TmxMapLoader().load(mapPath);
-        ground = getSingleLayer(map);
+        TiledMapTileLayer template = getSingleLayer(map);
+        if (width > 0 && height > 0) {
+            ground = new TiledMapTileLayer(width, height, template.getTileWidth(), template.getTileHeight());
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    ground.setCell(x, y, template.getCell(x % template.getWidth(), y % template.getHeight()));
+                }
+            }
+            map.getLayers().remove(template);
+            map.getLayers().add(ground);
+        } else {
+            ground = template;
+        }
         mapRenderer = createSingleLayerMapRenderer(map, batch);
+    }
+
+    public int getPixelWidth() { return getWidth() * ground.getTileWidth(); }
+    public int getPixelHeight() { return getHeight() * ground.getTileHeight(); }
+
+    public void setView(OrthographicCamera camera) {
+        mapRenderer.setView(camera);
+        batch.setProjectionMatrix(camera.combined);
     }
 
     public int getWidth() {

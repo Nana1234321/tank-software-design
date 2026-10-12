@@ -4,7 +4,10 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import java.util.Objects;
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -18,21 +21,31 @@ public final class GameApplication extends ApplicationAdapter {
     private Batch batch;
     private Field field;
     private FieldRenderer renderer;
+    private FitViewport viewport;
+    private final LevelSource levelSource;
+
+    public GameApplication() {
+        this(new RandomLevelSource(10, 8, 20, new Random()));
+    }
+
+    public GameApplication(LevelSource levelSource) {
+        this.levelSource = Objects.requireNonNull(levelSource);
+    }
 
     @Override
     public void create() {
+        Level level = levelSource.load(TANK_MOVEMENT_DURATION);
+        field = level.getField();
         batch = new SpriteBatch();
-        renderer = new FieldRenderer("level.tmx", batch);
+        renderer = new FieldRenderer("level.tmx", batch, field.getWidth(), field.getHeight());
+        viewport = new FitViewport(renderer.getPixelWidth(), renderer.getPixelHeight(), new OrthographicCamera());
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.registerAppearance(Tank.class, "images/tank_blue.png");
         renderer.registerAppearance(Tree.class, "images/greenTree.png");
-        createScene();
+        createControls(level.getPlayer());
     }
 
-    private void createScene() {
-        field = new Field(renderer.getWidth(), renderer.getHeight());
-        Tank tank = field.addObject(new Tank(
-                new GridPoint2(1, 1), Direction.RIGHT, field, TANK_MOVEMENT_DURATION));
-        field.addObject(new Tree(new GridPoint2(1, 3)));
+    private void createControls(Tank tank) {
         Map<Integer, Direction> bindings = new LinkedHashMap<>();
         bindings.put(UP, Direction.UP);
         bindings.put(W, Direction.UP);
@@ -54,7 +67,14 @@ public final class GameApplication extends ApplicationAdapter {
 
         Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f);
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
+        viewport.apply();
+        renderer.setView((OrthographicCamera) viewport.getCamera());
         renderer.render(field);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
     }
 
     @Override

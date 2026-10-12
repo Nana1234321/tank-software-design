@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class TreeTest {
     @Test public void treeIsStationaryAndProtectsItsPosition() {
         GridPoint2 cell = new GridPoint2(1,2);
-        Tree tree = new Field(5,5).spawnTree(cell);
+        Tree tree = new Field(5,5).addObject(new Tree(cell));
         cell.set(4,4);
         tree.getPositionOnGrid().set(99,99);
         tree.update(10f);
