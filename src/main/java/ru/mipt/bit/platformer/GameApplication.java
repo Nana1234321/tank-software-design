@@ -25,7 +25,7 @@ public final class GameApplication extends ApplicationAdapter {
     private final LevelSource levelSource;
 
     public GameApplication() {
-        this(new RandomLevelSource(10, 8, 20, new Random()));
+        this(new RandomLevelSource(10, 8, 20, 3, new Random()));
     }
 
     public GameApplication(LevelSource levelSource) {
@@ -43,6 +43,12 @@ public final class GameApplication extends ApplicationAdapter {
         renderer.registerAppearance(Tank.class, "images/tank_blue.png");
         renderer.registerAppearance(Tree.class, "images/greenTree.png");
         createControls(level.getPlayer());
+        for (GameObject object : field.getObjects()) {
+            if (object instanceof Tank && object != level.getPlayer()) {
+                inputHandlers.add(new TankController((Tank) object,
+                        new RandomControlStrategy(new Random())));
+            }
+        }
     }
 
     private void createControls(Tank tank) {

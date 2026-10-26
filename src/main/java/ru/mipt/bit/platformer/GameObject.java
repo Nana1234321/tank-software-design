@@ -14,6 +14,5 @@ public abstract class GameObject {
     }
 
     public void update(float deltaTime) {
-        // Static objects have no time-dependent behavior.
     }
 }

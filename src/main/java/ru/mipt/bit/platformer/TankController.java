@@ -1,41 +1,31 @@
 package ru.mipt.bit.platformer;
 
-import java.util.Objects;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.IntPredicate;
 
 public final class TankController implements InputHandler {
-    private final Movable target;
-    private final IntPredicate isKeyPressed;
-    private final Map<Integer, Direction> keyBindings;
+    private final Tank target;
+    private final ControlStrategy strategy;
 
-    /** Binding iteration order determines priority when several keys are pressed. */
-    public TankController(Movable target, IntPredicate isKeyPressed,
-                          Map<Integer, Direction> keyBindings) {
+    public TankController(Tank target, ControlStrategy strategy) {
         this.target = Objects.requireNonNull(target);
-        this.isKeyPressed = Objects.requireNonNull(isKeyPressed);
-        Map<Integer, Direction> copy = new LinkedHashMap<>();
-        Objects.requireNonNull(keyBindings).forEach((key, direction) ->
-                copy.put(Objects.requireNonNull(key), Objects.requireNonNull(direction)));
-        this.keyBindings = Collections.unmodifiableMap(copy);
+        this.strategy = Objects.requireNonNull(strategy);
+    }
+
+    public TankController(Tank target, IntPredicate isKeyPressed,
+                          Map<Integer, Direction> keyBindings) {
+        this(target, new KeyboardControlStrategy(isKeyPressed, keyBindings));
     }
 
     @Override
     public void handleInput() {
-        Direction direction = getPressedDirection();
-        if (direction != null) {
-            target.move(direction);
+        if (target.isMoving()) {
+            return;
         }
-    }
-
-    private Direction getPressedDirection() {
-        for (Map.Entry<Integer, Direction> binding : keyBindings.entrySet()) {
-            if (isKeyPressed.test(binding.getKey())) {
-                return binding.getValue();
-            }
+        Command command = strategy.nextCommand(target);
+        if (command != null) {
+            command.execute();
         }
-        return null;
     }
 }

@@ -20,7 +20,6 @@ public final class Field implements MovementSpace {
         this.height = height;
     }
 
-    /** Registers an object after checking its position and occupied cells. */
     public <T extends GameObject> T addObject(T object) {
         Objects.requireNonNull(object);
         if (objects.contains(object)) {
@@ -44,7 +43,6 @@ public final class Field implements MovementSpace {
         return object;
     }
 
-    /** A read-only view; registration remains the field's responsibility. */
     public List<GameObject> getObjects() {
         return Collections.unmodifiableList(objects);
     }

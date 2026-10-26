@@ -35,7 +35,6 @@ public final class Tank extends GameObject implements Movable {
 
     }
 
-    /** Starts a step if the next cell is free; ignores commands during a step. */
     @Override
     public void move(Direction newDirection) {
         if (isMoving()) {
@@ -80,7 +79,6 @@ public final class Tank extends GameObject implements Movable {
 
     @Override
     public boolean occupies(GridPoint2 cellCoordinates) {
-        // Reserve both cells until the movement is complete.
         return coordinates.equals(cellCoordinates)
                 || (isMoving() && destinationCoordinates.equals(cellCoordinates));
     }
@@ -90,7 +88,7 @@ public final class Tank extends GameObject implements Movable {
         return direction.getRotationDegrees();
     }
 
-    private boolean isMoving() {
+    public boolean isMoving() {
         return movementProgress < 1f;
     }
 
