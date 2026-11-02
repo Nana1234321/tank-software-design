@@ -2,16 +2,31 @@ package ru.mipt.bit.platformer;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import ru.mipt.bit.platformer.controller.InputHandler;
+import ru.mipt.bit.platformer.controller.RandomControlStrategy;
+import ru.mipt.bit.platformer.controller.TankController;
+import ru.mipt.bit.platformer.graphics.FieldRenderer;
+import ru.mipt.bit.platformer.model.Bullet;
+import ru.mipt.bit.platformer.model.Direction;
+import ru.mipt.bit.platformer.model.Field;
+import ru.mipt.bit.platformer.model.GameObject;
+import ru.mipt.bit.platformer.model.Level;
+import ru.mipt.bit.platformer.model.LevelSource;
+import ru.mipt.bit.platformer.model.RandomLevelSource;
+import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.Tree;
+
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
@@ -21,6 +36,7 @@ public final class GameApplication extends ApplicationAdapter {
     private Batch batch;
     private Field field;
     private FieldRenderer renderer;
+    private GameLoop gameLoop;
     private FitViewport viewport;
     private final LevelSource levelSource;
 
@@ -42,6 +58,8 @@ public final class GameApplication extends ApplicationAdapter {
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.registerAppearance(Tank.class, "images/tank_blue.png");
         renderer.registerAppearance(Tree.class, "images/greenTree.png");
+        renderer.registerSolidAppearance(Bullet.class, 12, 6, Color.RED);
+        field.addListener(renderer);
         createControls(level.getPlayer());
         for (GameObject object : field.getObjects()) {
             if (object instanceof Tank && object != level.getPlayer()) {
@@ -49,6 +67,7 @@ public final class GameApplication extends ApplicationAdapter {
                         new RandomControlStrategy(new Random())));
             }
         }
+        gameLoop = new GameLoop(field, inputHandlers, this::renderField);
     }
 
     private void createControls(Tank tank) {
@@ -66,16 +85,15 @@ public final class GameApplication extends ApplicationAdapter {
 
     @Override
     public void render() {
-        for (InputHandler handler : inputHandlers) {
-            handler.handleInput();
-        }
-        field.update(Gdx.graphics.getDeltaTime());
+        gameLoop.runFrame(Gdx.graphics.getDeltaTime());
+    }
 
+    private void renderField() {
         Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f);
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
         viewport.apply();
         renderer.setView((OrthographicCamera) viewport.getCamera());
-        renderer.render(field);
+        renderer.render();
     }
 
     @Override
@@ -85,6 +103,7 @@ public final class GameApplication extends ApplicationAdapter {
 
     @Override
     public void dispose() {
+        field.removeListener(renderer);
         renderer.dispose();
         batch.dispose();
     }

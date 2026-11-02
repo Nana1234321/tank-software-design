@@ -2,10 +2,11 @@ package ru.mipt.bit.platformer;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.IOException;
+import ru.mipt.bit.platformer.model.TextLevelSource;
 
 public final class GameDesktopLauncher {
 
