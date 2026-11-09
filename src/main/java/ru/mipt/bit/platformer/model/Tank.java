@@ -8,7 +8,7 @@ import java.util.Objects;
 public final class Tank extends GameObject implements TankActions {
 
     private static final int DEFAULT_HEALTH = 100;
-    private static final float BULLET_MOVEMENT_DURATION = 0.1f;
+    private static final float BULLET_MOVEMENT_DURATION = 0.2f;
     private static final float SHOT_COOLDOWN = 0.4f;
 
     private final GridPoint2 coordinates;
@@ -16,6 +16,7 @@ public final class Tank extends GameObject implements TankActions {
     private final GameWorld world;
     private final float movementDuration;
     private final int bulletDamage;
+    private final int maxHealth;
 
     private int health;
     private Direction direction;
@@ -52,6 +53,7 @@ public final class Tank extends GameObject implements TankActions {
         this.world = Objects.requireNonNull(world);
         this.movementDuration = movementDuration;
         this.health = initialHealth;
+        this.maxHealth = initialHealth;
         this.bulletDamage = bulletDamage;
 
     }
@@ -87,6 +89,10 @@ public final class Tank extends GameObject implements TankActions {
 
     public int getHealth() {
         return health;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     /** The assignment defines destruction strictly below zero, so zero is still alive. */

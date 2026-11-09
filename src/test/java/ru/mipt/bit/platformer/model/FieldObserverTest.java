@@ -214,7 +214,7 @@ public class FieldObserverTest {
         field.addListener(listener);
         left.shoot();
         right.shoot();
-        field.update(0.1f);
+        field.update(0.2f);
         assertEquals(4, listener.added.size());
         assertEquals(2, listener.removed.size());
         assertTrue(listener.removed.get(0) instanceof Bullet);

@@ -20,6 +20,25 @@ public class LevelSourceTest {
         assertTrue(level.getPlayer().occupies(new GridPoint2(1, 0)));
     }
 
+    @Test public void preservesTreeAndPlayerTypesAndPositionsFromText() {
+        Level level = new TextLevelSource("_T_\nX_T").load(1f);
+        Field field = level.getField();
+        assertEquals(3, field.getObjects().size());
+        assertTrue(field.getObjects().contains(level.getPlayer()));
+        assertTrue(level.getPlayer().occupies(new GridPoint2(0, 0)));
+
+        for (GridPoint2 cell : new GridPoint2[]{new GridPoint2(1, 1), new GridPoint2(2, 0)}) {
+            int treesAtCell = 0;
+            for (GameObject object : field.getObjects()) {
+                if (object.occupies(cell)) {
+                    assertTrue(object instanceof Tree);
+                    treesAtCell++;
+                }
+            }
+            assertEquals(1, treesAtCell);
+        }
+    }
+
     @Test public void rejectsMalformedText() {
         for (String text : new String[]{"", "__", "XX", "X?", "X\n\n_"}) {
             assertThrows(IllegalArgumentException.class,

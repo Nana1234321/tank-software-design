@@ -9,7 +9,7 @@ import ru.mipt.bit.platformer.model.GameObject;
 import static ru.mipt.bit.platformer.graphics.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.graphics.GdxGameUtils.drawTextureRegionUnscaled;
 
-public final class GameObjectRenderer {
+public final class GameObjectRenderer implements ObjectRenderer {
     private final TextureRegion graphics;
     private final Rectangle rectangle;
 
@@ -18,6 +18,7 @@ public final class GameObjectRenderer {
         rectangle = createBoundingRectangle(this.graphics);
     }
 
+    @Override
     public void render(Batch batch, GameObject object, float tileWidth, float tileHeight) {
         Vector2 center = object.getPositionOnGrid().scl(tileWidth, tileHeight);
         rectangle.setCenter(center);

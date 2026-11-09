@@ -25,7 +25,7 @@ public class DamageTest {
         shooter.shoot();
         Bullet bullet = (Bullet) field.getObjectsAt(new GridPoint2(1, 0)).get(0);
         assertEquals(35, bullet.getDamage());
-        field.update(0.3f);
+        field.update(0.6f);
         assertEquals(65, target.getHealth());
         assertEquals(100, shooter.getHealth());
         assertFalse(field.getObjects().contains(bullet));
@@ -104,7 +104,7 @@ public class DamageTest {
         assertTrue(target.occupies(new GridPoint2(2, 0)));
         assertTrue(target.occupies(new GridPoint2(3, 0)));
         shooter.shoot();
-        field.update(0.1f);
+        field.update(0.2f);
         assertEquals(-5, target.getHealth());
         assertFalse(field.getObjects().contains(target));
         assertTrue(field.isFree(new GridPoint2(2, 0), null));
@@ -165,7 +165,7 @@ public class DamageTest {
         field.addObject(right);
         left.shoot();
         right.shoot();
-        field.update(0.1f);
+        field.update(0.2f);
         assertEquals(100, left.getHealth());
         assertEquals(100, right.getHealth());
         assertEquals(2, field.getObjects().size());
