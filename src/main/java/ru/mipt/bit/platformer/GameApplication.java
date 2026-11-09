@@ -13,10 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import ru.mipt.bit.platformer.command.ToggleHealthBarsCommand;
 import ru.mipt.bit.platformer.controller.InputHandler;
 import ru.mipt.bit.platformer.controller.RandomControlStrategy;
 import ru.mipt.bit.platformer.controller.TankController;
 import ru.mipt.bit.platformer.graphics.FieldRenderer;
+import ru.mipt.bit.platformer.graphics.HealthBarVisibility;
 import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Field;
@@ -57,8 +59,13 @@ public final class GameApplication extends ApplicationAdapter {
         viewport = new FitViewport(renderer.getPixelWidth(), renderer.getPixelHeight(), new OrthographicCamera());
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         renderer.registerAppearance(Tank.class, "images/tank_blue.png");
+        renderer.setTint(level.getPlayer(), new Color(0.35f, 1f, 0.2f, 1f));
+        HealthBarVisibility healthBars = new HealthBarVisibility();
+        renderer.decorateWithHealthBars(Tank.class, healthBars);
+        ToggleHealthBarsCommand toggleHealthBars = new ToggleHealthBarsCommand(healthBars);
+        inputHandlers.add(() -> Gdx.input.isKeyJustPressed(L) ? toggleHealthBars : null);
         renderer.registerAppearance(Tree.class, "images/greenTree.png");
-        renderer.registerSolidAppearance(Bullet.class, 12, 6, Color.RED);
+        renderer.registerSolidAppearance(Bullet.class, 24, 12, Color.YELLOW);
         field.addListener(renderer);
         createControls(level.getPlayer());
         for (GameObject object : field.getObjects()) {

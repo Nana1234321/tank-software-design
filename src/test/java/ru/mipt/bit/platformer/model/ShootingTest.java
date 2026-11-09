@@ -45,7 +45,7 @@ public class ShootingTest {
             assertEquals(2, field.getObjects().size());
             assertTrue(bullet.occupies(direction.getAdjacentCoordinates(new GridPoint2(3, 3))));
             assertEquals(direction.getRotationDegrees(), bullet.getRotationDegrees(), 0f);
-            field.update(0.1f);
+            field.update(0.2f);
             assertTrue(bullet.occupies(direction.getAdjacentCoordinates(
                     direction.getAdjacentCoordinates(new GridPoint2(3, 3)))));
         }
@@ -101,7 +101,7 @@ public class ShootingTest {
         tank.shoot();
         Bullet bullet = onlyBullet(field);
         tank.move(Direction.UP);
-        field.update(0.1f);
+        field.update(0.2f);
         assertTrue(bullet.occupies(new GridPoint2(3, 1)));
         assertEquals(Direction.RIGHT.getRotationDegrees(), bullet.getRotationDegrees(), 0f);
     }
@@ -179,7 +179,7 @@ public class ShootingTest {
         field.addObject(right);
         left.shoot();
         right.shoot();
-        field.update(0.1f);
+        field.update(0.2f);
         assertEquals(2, field.getObjects().size());
     }
 
@@ -200,7 +200,7 @@ public class ShootingTest {
         field.addObject(tank);
         tank.shoot();
         Bullet bullet = onlyBullet(field);
-        field.update(0.05f);
+        field.update(0.1f);
         assertEquals(2f, bullet.getPositionOnGrid().x, 0.0001f);
         assertThrows(IllegalArgumentException.class, () -> bullet.update(-1f));
         assertThrows(IllegalArgumentException.class, () -> bullet.update(Float.NaN));

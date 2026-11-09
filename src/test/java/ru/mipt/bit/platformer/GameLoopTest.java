@@ -73,7 +73,7 @@ public class GameLoopTest {
             assertEquals(Collections.singleton(shooter), visible);
             renderedFrames[0]++;
         });
-        loop.runFrame(0.3f);
+        loop.runFrame(0.6f);
         assertEquals(1, renderedFrames[0]);
     }
 

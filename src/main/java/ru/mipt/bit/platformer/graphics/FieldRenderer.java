@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.Disposable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,10 @@ public final class FieldRenderer implements Disposable, FieldListener {
     private final Batch batch;
     private final Map<String, Texture> textures = new HashMap<>();
     private final List<Texture> generatedTextures = new ArrayList<>();
-    private final Map<Class<? extends GameObject>, GameObjectRenderer> renderers = new HashMap<>();
+    private final Map<Class<? extends GameObject>, ObjectRenderer> renderers = new HashMap<>();
+    private final Map<GameObject, Color> tints = new IdentityHashMap<>();
     private final Set<GameObject> objects = new LinkedHashSet<>();
+    private TextureRegion healthBarPixel;
 
     public FieldRenderer(String mapPath, Batch batch) {
         this(mapPath, batch, 0, 0);
@@ -78,6 +81,11 @@ public final class FieldRenderer implements Disposable, FieldListener {
         renderers.put(type, new GameObjectRenderer(new TextureRegion(texture)));
     }
 
+    /** Applies a tint to one object's appearance, leaving its overlays unchanged. */
+    public void setTint(GameObject object, Color color) {
+        tints.put(Objects.requireNonNull(object), new Color(Objects.requireNonNull(color)));
+    }
+
     public void registerSolidAppearance(Class<? extends GameObject> type,
                                         int width, int height, Color color) {
         Pixmap image = new Pixmap(width, height, Pixmap.Format.RGBA8888);
@@ -92,6 +100,26 @@ public final class FieldRenderer implements Disposable, FieldListener {
         }
     }
 
+    public void decorateWithHealthBars(Class<? extends GameObject> type,
+                                       HealthBarVisibility visibility) {
+        ObjectRenderer appearance = Objects.requireNonNull(renderers.get(type),
+                "Register an appearance before decorating it");
+        Objects.requireNonNull(visibility);
+        if (healthBarPixel == null) {
+            Pixmap image = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+            try {
+                image.setColor(Color.WHITE);
+                image.fill();
+                Texture texture = new Texture(image);
+                generatedTextures.add(texture);
+                healthBarPixel = new TextureRegion(texture);
+            } finally {
+                image.dispose();
+            }
+        }
+        renderers.put(type, new HealthBarRendererDecorator(appearance, visibility, healthBarPixel));
+    }
+
     @Override
     public void onObjectAdded(GameObject object) {
         objects.add(Objects.requireNonNull(object));
@@ -100,6 +128,7 @@ public final class FieldRenderer implements Disposable, FieldListener {
     @Override
     public void onObjectRemoved(GameObject object) {
         objects.remove(Objects.requireNonNull(object));
+        tints.remove(object);
     }
 
     public void render() {
@@ -107,11 +136,26 @@ public final class FieldRenderer implements Disposable, FieldListener {
         batch.begin();
         try {
             for (GameObject object : objects) {
-                GameObjectRenderer renderer = renderers.get(object.getClass());
+                ObjectRenderer renderer = renderers.get(object.getClass());
                 if (renderer == null) {
                     throw new IllegalStateException("No appearance for " + object.getClass().getSimpleName());
                 }
-                renderer.render(batch, object, ground.getTileWidth(), ground.getTileHeight());
+                Color tint = tints.get(object);
+                if (tint == null) {
+                    renderer.render(batch, object, ground.getTileWidth(), ground.getTileHeight());
+                } else {
+                    float previousColor = batch.getPackedColor();
+                    try {
+                        batch.setColor(tint);
+                        renderer.render(batch, object, ground.getTileWidth(), ground.getTileHeight());
+                    } finally {
+                        batch.setPackedColor(previousColor);
+                    }
+                }
+            }
+            for (GameObject object : objects) {
+                renderers.get(object.getClass()).renderOverlay(batch, object,
+                        ground.getTileWidth(), ground.getTileHeight());
             }
         } finally {
             batch.end();
@@ -121,6 +165,7 @@ public final class FieldRenderer implements Disposable, FieldListener {
     @Override
     public void dispose() {
         objects.clear();
+        tints.clear();
         mapRenderer.dispose();
         for (Texture texture : textures.values()) {
             texture.dispose();
