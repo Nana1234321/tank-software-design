@@ -1,0 +1,59 @@
+package ru.mipt.bit.platformer.model;
+
+import com.badlogic.gdx.math.GridPoint2;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class LevelSourceTest {
+    @Test public void loadsTextWithBomLineBreaksAndShortRows() {
+        Level level = new TextLevelSource("\uFEFF_T\r\nX").load(1f);
+        Field field = level.getField();
+        assertEquals(2, field.getWidth());
+        assertEquals(2, field.getHeight());
+        assertEquals(2, field.getObjects().size());
+        assertTrue(level.getPlayer().occupies(new GridPoint2(0, 0)));
+        assertFalse(field.isFree(new GridPoint2(1, 1), null));
+        assertTrue(field.isFree(new GridPoint2(1, 0), null));
+        level.getPlayer().move(Direction.RIGHT);
+        field.update(1f);
+        assertTrue(level.getPlayer().occupies(new GridPoint2(1, 0)));
+    }
+
+    @Test public void preservesTreeAndPlayerTypesAndPositionsFromText() {
+        Level level = new TextLevelSource("_T_\nX_T").load(1f);
+        Field field = level.getField();
+        assertEquals(3, field.getObjects().size());
+        assertTrue(field.getObjects().contains(level.getPlayer()));
+        assertTrue(level.getPlayer().occupies(new GridPoint2(0, 0)));
+
+        for (GridPoint2 cell : new GridPoint2[]{new GridPoint2(1, 1), new GridPoint2(2, 0)}) {
+            int treesAtCell = 0;
+            for (GameObject object : field.getObjects()) {
+                if (object.occupies(cell)) {
+                    assertTrue(object instanceof Tree);
+                    treesAtCell++;
+                }
+            }
+            assertEquals(1, treesAtCell);
+        }
+    }
+
+    @Test public void rejectsMalformedText() {
+        for (String text : new String[]{"", "__", "XX", "X?", "X\n\n_"}) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new TextLevelSource(text).load(1f));
+        }
+    }
+
+    @Test public void playerMustBelongToField() {
+        Field field = new Field(2, 2);
+        Tank player = new Tank(new GridPoint2(), Direction.RIGHT, field, 1f);
+        assertThrows(IllegalArgumentException.class, () -> new Level(field, player));
+        field.addObject(player);
+        Level level = new Level(field, player);
+        assertSame(field, level.getField());
+        assertSame(player, level.getPlayer());
+    }
+
+}
