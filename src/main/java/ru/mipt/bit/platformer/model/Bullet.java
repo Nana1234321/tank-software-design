@@ -4,6 +4,12 @@ import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 import java.util.Objects;
 
+/**
+ * Снаряд, который движется по полю и наносит урон при столкновении.
+ * Относится к domain и обращается к миру через GameWorld.
+ * Как и остальная модель, пока использует координаты LibGDX.
+ * Если появятся новые цели, проверки Tank и Bullet можно заменить общим интерфейсом попадания.
+ */
 public final class Bullet extends GameObject {
     public static final int DEFAULT_DAMAGE = 25;
 
@@ -39,7 +45,7 @@ public final class Bullet extends GameObject {
         return damage;
     }
 
-    /** Resolve a point-blank hit before attempting to register in an occupied cell. */
+    /** Сначала проверяем попадание в упор, чтобы не добавлять снаряд в занятую клетку. */
     void spawn() {
         if (destroyed) {
             return;
@@ -64,7 +70,7 @@ public final class Bullet extends GameObject {
             return;
         }
 
-        // Inspect every traversed cell, including when a frame takes several steps.
+        // Проверяем каждую клетку, даже если за кадр снаряд проходит несколько.
         double remainingSteps = movementProgress + (double) deltaTime / movementDuration;
         while (remainingSteps >= 1d) {
             GridPoint2 next = direction.getAdjacentCoordinates(coordinates);

@@ -2,6 +2,11 @@ package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
+/**
+ * Направление движения в игровой модели (domain).
+ * Это значение, а не отдельная сущность. Метод соседней клетки пока возвращает
+ * GridPoint2 из LibGDX; при отделении модели его тоже нужно заменить.
+ */
 public enum Direction {
 
     UP(0, 1, 90f),

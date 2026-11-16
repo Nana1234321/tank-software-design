@@ -8,6 +8,11 @@ import ru.mipt.bit.platformer.command.ShootCommand;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.TankActions;
 
+/**
+ * Выбирает случайное действие для AI-танка.
+ * Относится к application и реализует ControlStrategy.
+ * Внешнего ввода здесь нет: это простая логика управления ботом.
+ */
 public final class RandomControlStrategy implements ControlStrategy {
     private final Random random;
 

@@ -8,6 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import ru.mipt.bit.platformer.model.TextLevelSource;
 
+/**
+ * Запускает desktop-версию игры и разбирает аргументы командной строки.
+ * Относится к infrastructure. Здесь выбирается источник уровня и настраивается окно.
+ * Чтение файла пока находится прямо в main; его можно вынести в файловый адаптер LevelSource.
+ */
 public final class GameDesktopLauncher {
 
     private GameDesktopLauncher() {
@@ -24,7 +29,7 @@ public final class GameDesktopLauncher {
         Lwjgl3ApplicationConfiguration config =
                 new Lwjgl3ApplicationConfiguration();
 
-        // Level width: 10 tiles x 128px, height: 8 tiles x 128px.
+        // Начальный размер окна: 10 на 8 клеток по 128 пикселей.
         config.setWindowedMode(1280, 1024);
 
         new Lwjgl3Application(game, config);

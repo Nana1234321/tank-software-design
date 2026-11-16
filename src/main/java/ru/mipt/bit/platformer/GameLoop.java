@@ -7,7 +7,13 @@ import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.controller.InputHandler;
 import ru.mipt.bit.platformer.model.Field;
 
-/** Runs one frame in the order: collect commands, execute, update, render. */
+/**
+ * Выполняет один кадр: собирает команды, выполняет их, обновляет поле и вызывает отрисовку.
+ * Это сценарий слоя application.
+ * InputHandler — порт получения команд, а renderFrame — переданная снаружи функция отрисовки.
+ * Для ясности можно выделить интерфейсы AdvanceFrame и RenderFrame, хотя текущая схема
+ * уже позволяет подменять ввод и отрисовку.
+ */
 public final class GameLoop {
     private final Field field;
     private final List<InputHandler> inputHandlers;
@@ -26,7 +32,7 @@ public final class GameLoop {
             throw new IllegalArgumentException("Delta time must be finite and non-negative");
         }
 
-        // 1. Collect all player and AI commands before changing the world.
+        // Сначала собираем команды игрока и AI, пока мир еще не изменился.
         List<Command> commands = new ArrayList<>();
         for (InputHandler handler : inputHandlers) {
             Command command = handler.createCommand();
@@ -35,15 +41,15 @@ public final class GameLoop {
             }
         }
 
-        // 2. Execute only the commands collected for this frame, in collection order.
+        // Выполняем собранные команды по порядку.
         for (Command command : commands) {
             command.execute();
         }
 
-        // 3. Advance the logical state of every registered object.
+        // Обновляем объекты на поле.
         field.update(deltaTime);
 
-        // 4. Draw the resulting state, including all observer updates.
+        // Рисуем кадр после обновления модели.
         renderFrame.run();
     }
 }

@@ -11,6 +11,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import java.util.NoSuchElementException;
 
+/**
+ * Вспомогательные методы для карт и текстур LibGDX.
+ * Используются внутри графического адаптера, то есть в infrastructure.
+ */
 public final class GdxGameUtils {
 
     private GdxGameUtils() {

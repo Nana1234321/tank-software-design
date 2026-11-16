@@ -18,6 +18,7 @@ import ru.mipt.bit.platformer.model.Tree;
 import static org.junit.Assert.*;
 
 public class HealthBarRendererTest {
+    /** Записывает вызовы Batch, чтобы проверить отрисовку без настоящего окна. */
     private static final class RecordingBatch {
         final List<float[]> draws = new ArrayList<>();
         final Color color = new Color(0.2f, 0.4f, 0.6f, 0.8f);

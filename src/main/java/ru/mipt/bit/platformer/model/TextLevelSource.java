@@ -3,7 +3,12 @@ package ru.mipt.bit.platformer.model;
 import com.badlogic.gdx.math.GridPoint2;
 import java.util.Objects;
 
-/** T = tree, X = player, _ = empty. Short rows are padded on the right. */
+/**
+ * Собирает уровень из текста: T — дерево, X — игрок, _ — пустая клетка.
+ * Короткие строки дополняются пустыми клетками справа.
+ * Это адаптер LevelSource из слоя infrastructure, несмотря на пакет model.
+ * Файл здесь не читается: готовую строку передает GameDesktopLauncher.
+ */
 public final class TextLevelSource implements LevelSource {
     private final String text;
 

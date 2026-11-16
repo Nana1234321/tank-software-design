@@ -2,6 +2,10 @@ package ru.mipt.bit.platformer.model;
 
 import java.util.Objects;
 
+/**
+ * Объединяет поле и игрока, который находится на этом поле.
+ * Относится к domain. Источники уровня возвращают этот объект через LevelSource.
+ */
 public final class Level {
     private final Field field;
     private final Tank player;

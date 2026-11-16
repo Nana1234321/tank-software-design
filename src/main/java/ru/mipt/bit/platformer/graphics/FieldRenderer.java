@@ -25,6 +25,12 @@ import ru.mipt.bit.platformer.model.GameObject;
 import static ru.mipt.bit.platformer.graphics.GdxGameUtils.createSingleLayerMapRenderer;
 import static ru.mipt.bit.platformer.graphics.GdxGameUtils.getSingleLayer;
 
+/**
+ * Рисует поле и игровые объекты средствами LibGDX.
+ * Это выходной адаптер FieldListener из слоя infrastructure.
+ * По уведомлениям поля обновляет список объектов, а при render рисует их.
+ * Вызов отрисовки передается в GameLoop через GameApplication.
+ */
 public final class FieldRenderer implements Disposable, FieldListener {
     private final TiledMap map;
     private final TiledMapTileLayer ground;
@@ -81,7 +87,7 @@ public final class FieldRenderer implements Disposable, FieldListener {
         renderers.put(type, new GameObjectRenderer(new TextureRegion(texture)));
     }
 
-    /** Applies a tint to one object's appearance, leaving its overlays unchanged. */
+    /** Задает оттенок самого объекта. Цвет полос здоровья не меняется. */
     public void setTint(GameObject object, Color color) {
         tints.put(Objects.requireNonNull(object), new Color(Objects.requireNonNull(color)));
     }

@@ -5,6 +5,12 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import java.util.Objects;
 
+/**
+ * Танк: хранит здоровье, движется и стреляет. Это сущность слоя domain.
+ * Доступные действия описаны в TankActions, а поведение зависит от TankState.
+ * Для полной независимости модели от LibGDX нужно заменить его типы координат
+ * и Interpolation собственными вычислениями.
+ */
 public final class Tank extends GameObject implements TankActions {
 
     private static final int DEFAULT_HEALTH = 100;
@@ -19,6 +25,8 @@ public final class Tank extends GameObject implements TankActions {
     private final int maxHealth;
 
     private int health;
+    private TankState state;
+    private final TankStateContext stateContext = new StateContext();
     private Direction direction;
     private float movementProgress = 1f;
     private float timeUntilNextShot;
@@ -55,7 +63,7 @@ public final class Tank extends GameObject implements TankActions {
         this.health = initialHealth;
         this.maxHealth = initialHealth;
         this.bulletDamage = bulletDamage;
-
+        this.state = HealthTankState.forHealth(health, maxHealth);
     }
 
     @Override
@@ -77,14 +85,28 @@ public final class Tank extends GameObject implements TankActions {
 
     @Override
     public void shoot() {
-        // Commands are accepted between grid steps, just like movement commands.
+        if (isAlive()) {
+            state.shoot(stateContext);
+        }
+    }
+
+    private void fire(float cooldownMultiplier) {
+        // Стрелять можно между шагами, когда танк закончил движение в следующую клетку.
         if (!isAlive() || isMoving() || timeUntilNextShot > 0f) {
             return;
         }
         Bullet bullet = new Bullet(direction.getAdjacentCoordinates(coordinates),
                 direction, world, BULLET_MOVEMENT_DURATION, bulletDamage);
         bullet.spawn();
-        timeUntilNextShot = SHOT_COOLDOWN;
+        timeUntilNextShot = SHOT_COOLDOWN * cooldownMultiplier;
+    }
+
+    public TankState getState() {
+        return state;
+    }
+
+    public void setState(TankState state) {
+        this.state = Objects.requireNonNull(state);
     }
 
     public int getHealth() {
@@ -95,7 +117,7 @@ public final class Tank extends GameObject implements TankActions {
         return maxHealth;
     }
 
-    /** The assignment defines destruction strictly below zero, so zero is still alive. */
+    /** По условию танк уничтожается при здоровье ниже нуля. При нуле он еще жив. */
     public boolean isAlive() {
         return health >= 0;
     }
@@ -110,6 +132,8 @@ public final class Tank extends GameObject implements TankActions {
         health -= damage;
         if (!isAlive()) {
             world.removeObject(this);
+        } else {
+            state.onHealthChanged(stateContext);
         }
     }
 
@@ -126,7 +150,12 @@ public final class Tank extends GameObject implements TankActions {
             return;
         }
 
-        movementProgress = Math.min(1f, movementProgress + deltaTime / movementDuration);
+        state.updateMovement(stateContext, deltaTime);
+    }
+
+    private void advanceMovement(float deltaTime, float speedMultiplier) {
+        movementProgress = Math.min(1f,
+                movementProgress + deltaTime * speedMultiplier / movementDuration);
 
         if (!isMoving()) {
             coordinates.set(destinationCoordinates);
@@ -155,6 +184,32 @@ public final class Tank extends GameObject implements TankActions {
 
     public boolean isMoving() {
         return isAlive() && movementProgress < 1f;
+    }
+
+    /**
+     * Связывает операции TankStateContext с этим танком внутри domain.
+     * Состояния могут вызвать эти операции, а остальной код их не видит.
+     */
+    private final class StateContext implements TankStateContext {
+        @Override public int getHealth() {
+            return Tank.this.getHealth();
+        }
+
+        @Override public int getMaxHealth() {
+            return Tank.this.getMaxHealth();
+        }
+
+        @Override public void changeState(TankState nextState) {
+            setState(nextState);
+        }
+
+        @Override public void advanceMovement(float deltaTime, float speedMultiplier) {
+            Tank.this.advanceMovement(deltaTime, speedMultiplier);
+        }
+
+        @Override public void fire(float cooldownMultiplier) {
+            Tank.this.fire(cooldownMultiplier);
+        }
     }
 
 }

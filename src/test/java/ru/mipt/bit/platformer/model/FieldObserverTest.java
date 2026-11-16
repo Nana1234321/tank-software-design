@@ -12,6 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class FieldObserverTest {
+    /** Заменяет графического наблюдателя в тестах: записывает события FieldListener. */
     private static final class RecordingListener implements FieldListener {
         private final Field field;
         private final Set<GameObject> visible = new LinkedHashSet<>();

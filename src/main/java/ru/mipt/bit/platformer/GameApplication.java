@@ -32,6 +32,11 @@ import ru.mipt.bit.platformer.model.Tree;
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 
+/**
+ * Подключает игру к LibGDX: получает ввод, запускает кадры и рисует поле.
+ * Это входной адаптер слоя infrastructure. Здесь же собираются зависимости игры.
+ * Создание уровня и контроллеров со временем стоит вынести в отдельный сценарий application.
+ */
 public final class GameApplication extends ApplicationAdapter {
     private static final float TANK_MOVEMENT_DURATION = 0.4f;
     private final List<InputHandler> inputHandlers = new ArrayList<>();

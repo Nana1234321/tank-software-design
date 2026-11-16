@@ -7,6 +7,12 @@ import ru.mipt.bit.platformer.command.Command;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Tank;
 
+/**
+ * Связывает танк и способ управления с портом InputHandler.
+ * Проверяет, готов ли танк принять команду, затем запрашивает ее у ControlStrategy.
+ * Эта часть относится к application. Конструктор, создающий KeyboardControlStrategy,
+ * добавляет зависимость от адаптера клавиатуры; лучше собирать его в GameApplication.
+ */
 public final class TankController implements InputHandler {
     private final Tank target;
     private final ControlStrategy strategy;

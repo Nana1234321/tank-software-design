@@ -13,11 +13,16 @@ import ru.mipt.bit.platformer.model.TankActions;
 
 import static com.badlogic.gdx.Input.Keys.SPACE;
 
+/**
+ * Переводит нажатия клавиш в команды движения и стрельбы.
+ * Это адаптер ввода из слоя infrastructure. Проверка клавиш передается через IntPredicate,
+ * а связь с Gdx.input настраивается в GameApplication.
+ */
 public final class KeyboardControlStrategy implements ControlStrategy {
     private final IntPredicate isKeyPressed;
     private final Map<Integer, Direction> keyBindings;
 
-    /** Space takes priority; movement bindings are checked in iteration order. */
+    /** Пробел имеет приоритет. Клавиши движения проверяются в порядке добавления. */
     public KeyboardControlStrategy(IntPredicate isKeyPressed,
                           Map<Integer, Direction> keyBindings) {
         this.isKeyPressed = Objects.requireNonNull(isKeyPressed);

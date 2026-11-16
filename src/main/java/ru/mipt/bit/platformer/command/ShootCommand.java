@@ -3,6 +3,10 @@ package ru.mipt.bit.platformer.command;
 import java.util.Objects;
 import ru.mipt.bit.platformer.model.Shootable;
 
+/**
+ * Передает запрос на выстрел через Shootable.
+ * Это действие слоя application; перезарядку и ограничения проверяет сам танк.
+ */
 public final class ShootCommand implements Command {
     private final Shootable target;
 

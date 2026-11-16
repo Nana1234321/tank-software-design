@@ -1,6 +1,10 @@
 package ru.mipt.bit.platformer.model;
 
-/** Receives changes to the objects registered in a logical field. */
+/**
+ * Выходной порт уведомлений о добавлении и удалении объектов поля.
+ * Принадлежит domain; FieldRenderer реализует его на стороне графики.
+ * Сейчас передаются сами игровые объекты. Для отправки событий по сети понадобятся снимки данных.
+ */
 public interface FieldListener {
     void onObjectAdded(GameObject object);
 

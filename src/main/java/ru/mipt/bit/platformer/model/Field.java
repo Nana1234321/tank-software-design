@@ -7,6 +7,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Хранит объекты игрового мира и проверяет, какие клетки заняты.
+ * Относится к domain и реализует GameWorld. О добавлении и удалении объектов
+ * сообщает через выходной порт FieldListener, не зная, кто их рисует.
+ * Зависимость от координат LibGDX пока остается.
+ */
 public final class Field implements GameWorld {
     private final int width;
     private final int height;
@@ -21,7 +27,7 @@ public final class Field implements GameWorld {
         this.height = height;
     }
 
-    /** Subscribe once and deliver existing objects through the same addition event. */
+    /** Подписывает наблюдателя и сразу сообщает ему об объектах, которые уже есть на поле. */
     public void addListener(FieldListener listener) {
         Objects.requireNonNull(listener);
         if (listeners.contains(listener)) {

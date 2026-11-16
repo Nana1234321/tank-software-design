@@ -3,6 +3,10 @@ package ru.mipt.bit.platformer.model;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Неподвижное препятствие на поле. Сущность слоя domain.
+ * Координаты пока хранятся в типах LibGDX, как и у других игровых объектов.
+ */
 public final class Tree extends GameObject {
     private final GridPoint2 coordinates;
 

@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * Создает случайный уровень с деревьями и танками.
+ * Это еще один адаптер LevelSource на стороне infrastructure.
+ * Если генерация станет сложнее, ее правила можно вынести в отдельный сервис domain.
+ */
 public final class RandomLevelSource implements LevelSource {
     private final int width;
     private final int height;

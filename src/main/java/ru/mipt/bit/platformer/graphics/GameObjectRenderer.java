@@ -9,6 +9,10 @@ import ru.mipt.bit.platformer.model.GameObject;
 import static ru.mipt.bit.platformer.graphics.GdxGameUtils.createBoundingRectangle;
 import static ru.mipt.bit.platformer.graphics.GdxGameUtils.drawTextureRegionUnscaled;
 
+/**
+ * Рисует текстуру объекта в нужном месте и с нужным поворотом.
+ * Относится к infrastructure и реализует ObjectRenderer внутри графического адаптера.
+ */
 public final class GameObjectRenderer implements ObjectRenderer {
     private final TextureRegion graphics;
     private final Rectangle rectangle;

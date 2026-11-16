@@ -8,7 +8,11 @@ import java.util.Objects;
 import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.Tank;
 
-/** Adds health bars to the wrapped appearance without changing the game model. */
+/**
+ * Добавляет полоску здоровья к обычной отрисовке объекта.
+ * Это декоратор ObjectRenderer из слоя infrastructure.
+ * Здоровье берется из модели, но сама модель здесь не меняется.
+ */
 public final class HealthBarRendererDecorator implements ObjectRenderer {
     private final ObjectRenderer delegate;
     private final HealthBarVisibility visibility;
